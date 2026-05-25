@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
-    "fastmcp": "^3.18.0",
+    "fastmcp": "^4.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "satori": "^0.12.1",
