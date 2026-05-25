@@ -1,13 +1,25 @@
 name: CI
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
+# Grant the GITHUB_TOKEN read-only permissions for the repository contents.
+permissions:
+  contents: read
+
+# Cancel in-progress runs of the same workflow on the same branch/PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
