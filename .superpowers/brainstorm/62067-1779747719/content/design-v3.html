@@ -1,0 +1,54 @@
+<h2>Refined CI Workflow Design (v3)</h2>
+<p class="subtitle">Applying performance optimizations and best practices.</p>
+
+<div class="mockup">
+  <div class="mockup-header">.github/workflows/ci.yml</div>
+  <div class="mockup-body">
+    <div class="section">
+      <div class="label">Optimized Triggers</div>
+      <ul>
+        <li><code>pull_request</code> to <code>main</code> — Catch issues before merging.</li>
+        <li><code>workflow_dispatch</code> — Manual override for debugging.</li>
+        <li><i>(Push to main removed to avoid double-runs on merge)</i></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Job: quality-and-test</div>
+      <ul>
+        <li><b>OS:</b> <code>ubuntu-latest</code></li>
+        <li><b>Node:</b> <code>22</code> (Pinned for stability)</li>
+        <li><b>Caching:</b> <code>actions/setup-node</code> with <code>cache: 'npm'</code></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Scripts (package.json)</div>
+      <ul>
+        <li><code>"lint": "biome ci ."</code></li>
+        <li><code>"typecheck": "tsc --noEmit"</code></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Execution Steps</div>
+      <ol>
+        <li><code>npm ci</code> — Fast install via cache</li>
+        <li><code>npm run lint</code> — Fast fail on style/lint</li>
+        <li><code>npm run typecheck</code> — Verify type safety</li>
+        <li><code>npm test</code> — Run vitest suite</li>
+        <li><code>npm run build</code> — Verify production build</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Design Improvements Applied</h3>
+  <ul>
+    <li><b>Speed:</b> npm caching saves minutes on every run.</li>
+    <li><b>Stability:</b> Pinned Node 22 prevents unexpected breakages.</li>
+    <li><b>Efficiency:</b> Removed redundant push-to-main trigger.</li>
+    <li><b>Consistency:</b> Using npm scripts ensures CI matches local dev commands.</li>
+  </ul>
+</div>

@@ -1,0 +1,43 @@
+<h2>Refined CI Workflow Design (v4)</h2>
+<p class="subtitle">Updated with latest Node.js LTS (v24).</p>
+
+<div class="mockup">
+  <div class="mockup-header">.github/workflows/ci.yml</div>
+  <div class="mockup-body">
+    <div class="section">
+      <div class="label">Optimized Triggers</div>
+      <ul>
+        <li><code>pull_request</code> to <code>main</code></li>
+        <li><code>workflow_dispatch</code></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Job: quality-and-test</div>
+      <ul>
+        <li><b>OS:</b> <code>ubuntu-latest</code></li>
+        <li><b>Node:</b> <code>24</code> (Latest LTS)</li>
+        <li><b>Caching:</b> <code>actions/setup-node</code> with <code>cache: 'npm'</code></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Scripts (package.json)</div>
+      <ul>
+        <li><code>"lint": "biome ci ."</code></li>
+        <li><code>"typecheck": "tsc --noEmit"</code></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="label">Execution Steps</div>
+      <ol>
+        <li><code>npm ci</code></li>
+        <li><code>npm run lint</code></li>
+        <li><code>npm run typecheck</code></li>
+        <li><code>npm test</code></li>
+        <li><code>npm run build</code></li>
+      </ol>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<h2>Proposed CI Steps</h2>
+<p class="subtitle">A typical TypeScript CI pipeline ensures code quality and build integrity at every step.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Workflow: CI</div>
+  <div class="mockup-body">
+    <div class="section">
+      <div class="label">Job: build-and-test</div>
+      <ul>
+        <li><b>Checkout:</b> Pull the latest code.</li>
+        <li><b>Setup Node.js:</b> Use the project's required version (and cache <code>node_modules</code>).</li>
+        <li><b>Install:</b> <code>npm clean-install</code></li>
+        <li><b>Type Check:</b> <code>tsc --noEmit</code> to catch TypeScript errors.</li>
+        <li><b>Test:</b> <code>npm test</code> (vitest) to run unit and integration tests.</li>
+        <li><b>Build:</b> <code>npm run build</code> (tsup) to verify the production bundle.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Question: Matrix Testing</h3>
+  <p>Should we run these tests against multiple Node.js versions (e.g., 20.x, 22.x) to ensure broad compatibility, or just the latest LTS?</p>
+</div>

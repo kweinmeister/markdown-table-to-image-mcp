@@ -1,0 +1,64 @@
+<h2>Linting & Formatting Comparison</h2>
+<p class="subtitle">Researching modern alternatives for project quality checks.</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Oxlint</div>
+    <div class="mockup-body">
+      <div class="label">Focus: Performance</div>
+      <ul>
+        <li><b>Speed:</b> Extremely fast (written in Rust).</li>
+        <li><b>Scope:</b> Linting only (no formatting yet).</li>
+        <li><b>Compatibility:</b> Supports ESLint rules (50-100x faster).</li>
+        <li><b>Best for:</b> Large projects where CI speed is a bottleneck.</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="mockup">
+    <div class="mockup-header">Biome</div>
+    <div class="mockup-body">
+      <div class="label">Focus: All-in-one</div>
+      <ul>
+        <li><b>Speed:</b> Very fast (Rust-based).</li>
+        <li><b>Scope:</b> Linting + Formatting.</li>
+        <li><b>Compatibility:</b> Replaces ESLint + Prettier in one tool.</li>
+        <li><b>Best for:</b> New projects wanting zero-config simplicity.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 1rem;">
+  <div class="mockup-header">Prettier</div>
+  <div class="mockup-body">
+    <div class="label">Focus: Standard</div>
+    <ul>
+      <li><b>Speed:</b> Slower (Node.js based).</li>
+      <li><b>Scope:</b> Formatting only.</li>
+      <li><b>Status:</b> The industry standard.</li>
+      <li><b>Best for:</b> Projects where consistency with the ecosystem is priority #1.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Comparison Summary</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Biome</h4>
+      <ul>
+        <li>Unified toolchain</li>
+        <li>Instant feedback</li>
+        <li>Simplified CI config</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Oxlint / Prettier</h4>
+      <ul>
+        <li>Requires managing two tools</li>
+        <li>Prettier can be slow on CI</li>
+      </ul>
+    </div>
+  </div>
+</div>
