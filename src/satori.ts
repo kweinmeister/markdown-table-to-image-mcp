@@ -22,6 +22,7 @@ let fontCache: Array<{
  */
 function getAssetPath(fontName: string): string {
   const possiblePaths = [
+    path.join(__dirname, fontName),
     path.join(__dirname, "assets", fontName),
     path.join(__dirname, "..", "src", "assets", fontName),
     path.join(process.cwd(), "src", "assets", fontName),
