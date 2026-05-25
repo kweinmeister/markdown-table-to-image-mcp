@@ -62,15 +62,15 @@ Open **Manage MCP Servers → View raw config** and edit `~/.gemini/antigravity/
 
 Converts a Markdown table string to a styled PNG image card.
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `markdown` | string | required | Raw Markdown table (must include header and separator rows). Max 50,000 chars, 50 columns, 500 rows. |
-| `title` | string | — | Optional title displayed above the table. Max 200 chars. |
-| `theme` | string | `glassmorphism` | Visual theme. See [Themes](#themes). |
-| `aspectRatio` | string | `auto` | Canvas proportions. One of `auto`, `16:9`, `1:1`, `9:16`. `auto` shrinks the canvas to fit the card. |
-| `scale` | number | `2` | High-DPI multiplier (0.5–4). Use `2` for Retina-sharp output. |
-| `customWidth` | integer | `800` | Canvas width in logical pixels (200–3840). |
-| `transparentBackground` | boolean | `false` | Renders the card panel without a fill. The canvas retains its theme background. |
+| Parameter               | Type    | Default         | Description                                                                                          |
+| ----------------------- | ------- | --------------- | ---------------------------------------------------------------------------------------------------- |
+| `markdown`              | string  | required        | Raw Markdown table (must include header and separator rows). Max 50,000 chars, 50 columns, 500 rows. |
+| `title`                 | string  | —               | Optional title displayed above the table. Max 200 chars.                                             |
+| `theme`                 | string  | `glassmorphism` | Visual theme. See [Themes](#themes).                                                                 |
+| `aspectRatio`           | string  | `auto`          | Canvas proportions. One of `auto`, `16:9`, `1:1`, `9:16`. `auto` shrinks the canvas to fit the card. |
+| `scale`                 | number  | `2`             | High-DPI multiplier (0.5–4). Use `2` for Retina-sharp output.                                        |
+| `customWidth`           | integer | `800`           | Canvas width in logical pixels (200–3840).                                                           |
+| `transparentBackground` | boolean | `false`         | Renders the card panel without a fill. The canvas retains its theme background.                      |
 
 #### Example prompt
 
@@ -89,13 +89,13 @@ Convert this to a synthwave-themed image with a 1:1 canvas:
 
 ## Themes
 
-| Theme | Description | Preview |
-|---|---|---|
-| `glassmorphism` | Dark canvas, frosted-glass card with blue-purple accents | ![glassmorphism](./docs/assets/themes/glassmorphism.png) |
-| `slate-dark` | Deep slate background with clean white typography | ![slate-dark](./docs/assets/themes/slate-dark.png) |
-| `minimalist-light` | White card on a light grey canvas, high-contrast text | ![minimalist-light](./docs/assets/themes/minimalist-light.png) |
-| `emerald-glow` | Dark background with emerald green highlights | ![emerald-glow](./docs/assets/themes/emerald-glow.png) |
-| `synthwave` | Purple and pink neon gradients on a deep dark canvas | ![synthwave](./docs/assets/themes/synthwave.png) |
+| Theme              | Description                                              | Preview                                                        |
+| ------------------ | -------------------------------------------------------- | -------------------------------------------------------------- |
+| `glassmorphism`    | Dark canvas, frosted-glass card with blue-purple accents | ![glassmorphism](./docs/assets/themes/glassmorphism.png)       |
+| `slate-dark`       | Deep slate background with clean white typography        | ![slate-dark](./docs/assets/themes/slate-dark.png)             |
+| `minimalist-light` | White card on a light grey canvas, high-contrast text    | ![minimalist-light](./docs/assets/themes/minimalist-light.png) |
+| `emerald-glow`     | Dark background with emerald green highlights            | ![emerald-glow](./docs/assets/themes/emerald-glow.png)         |
+| `synthwave`        | Purple and pink neon gradients on a deep dark canvas     | ![synthwave](./docs/assets/themes/synthwave.png)               |
 
 ## Development
 
