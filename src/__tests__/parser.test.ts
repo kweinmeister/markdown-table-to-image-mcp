@@ -7,16 +7,11 @@ describe("Markdown Table Parser", () => {
       expect(cleanCell("  hello  ")).toBe("hello");
     });
 
-    it("should strip HTML tags to prevent XSS/breakouts", () => {
-      expect(cleanCell("<b>hello</b>")).toBe("hello");
-      expect(cleanCell("<script>alert(1)</script>hello")).toBe("hello");
-      expect(cleanCell("hello <img src='x' onerror='abc'/>")).toBe("hello");
-    });
-
-    it("should handle nested script injection edge cases cleanly", () => {
-      // The inner script block is stripped, leaving the outer structural characters as text.
-      // In a display context, this is safely rendered as plain text without executing.
-      expect(cleanCell("<sc<script>ript>alert(1)</sc</script>ript>")).toBe("");
+    it("should preserve HTML tags, math expressions, and generic types cleanly (XSS protected by React JSX native auto-escaping)", () => {
+      expect(cleanCell("<b>hello</b>")).toBe("<b>hello</b>");
+      expect(cleanCell("A < B > C")).toBe("A < B > C");
+      expect(cleanCell("List<String>")).toBe("List<String>");
+      expect(cleanCell("<script>alert(1)</script>hello")).toBe("<script>alert(1)</script>hello");
     });
 
     it("should preserve standard markdown syntax in cells without modification", () => {
@@ -82,6 +77,29 @@ Val 1 | Val 2
       `;
       const parsed = parseMarkdownTable(md);
       expect(parsed.rows[0][0]).toBe("ls | grep");
+    });
+
+    it("should handle escaped backslashes preceding separator pipes correctly", () => {
+      const md = `
+| File Path | Description |
+| --- | --- |
+| C:\\\\ | Root Windows folder |
+| folder\\\\\\|sub | literal backslash and pipe |
+      `;
+      const parsed = parseMarkdownTable(md);
+      expect(parsed.rows[0][0]).toBe("C:\\\\");
+      expect(parsed.rows[1][0]).toBe("folder\\\\|sub");
+    });
+
+    it("should preserve math expressions and generic types securely in full table renders", () => {
+      const md = `
+| Expression | Type |
+| --- | --- |
+| A < B > C | List<String> |
+      `;
+      const parsed = parseMarkdownTable(md);
+      expect(parsed.rows[0][0]).toBe("A < B > C");
+      expect(parsed.rows[0][1]).toBe("List<String>");
     });
 
     it("should pad shorter rows and truncate longer rows", () => {

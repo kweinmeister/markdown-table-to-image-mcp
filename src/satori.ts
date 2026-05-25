@@ -54,12 +54,6 @@ function loadFonts() {
       weight: 700,
       style: "normal",
     },
-    {
-      name: "Roboto Mono",
-      data: fs.readFileSync(getAssetPath("RobotoMono-Regular.ttf")),
-      weight: 400,
-      style: "normal",
-    },
   ];
 
   return fontCache;

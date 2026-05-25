@@ -1,16 +1,10 @@
 import type { ParsedTable } from "./schemas.js";
 
 /**
- * Clean cell content by stripping HTML tags to prevent XSS or Satori JSX structural breakouts.
- * Also handles unescaping of markdown characters like pipes.
+ * Clean cell content by handling unescaping of markdown characters like pipes.
  */
 export function cleanCell(val: string): string {
-  return val
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]*>/g, "")
-    .replace(/\\\|/g, "|")
-    .trim();
+  return val.replace(/\\\|/g, "|").trim();
 }
 
 /**
@@ -64,11 +58,11 @@ export function parseMarkdownTable(markdown: string): ParsedTable {
   const rawHeaderLine = lines[headerIndex].trim();
   const rawSeparatorLine = lines[separatorIndex].trim();
 
-  // Split and helper to strip leading/trailing empty items from boundary pipes
-  // Note: Uses a negative lookbehind to avoid splitting on escaped pipes (\|)
   const splitColumns = (line: string): string[] => {
-    // split by pipe | that is not preceded by a backslash \
-    const cols = line.split(/(?<!\\)\|/).map((c) => c.trim());
+    const protectedLine = line.replace(/\\\\/g, "__ESCAPED_BS__");
+    const cols = protectedLine
+      .split(/(?<!\\)\|/)
+      .map((c) => c.replace(/__ESCAPED_BS__/g, "\\\\").trim());
     if (line.startsWith("|")) cols.shift();
     if (line.endsWith("|")) cols.pop();
     return cols;
@@ -104,8 +98,7 @@ export function parseMarkdownTable(markdown: string): ParsedTable {
   const rows: string[][] = [];
   for (let i = separatorIndex + 1; i < lines.length; i++) {
     const line = lines[i].trim();
-    // Stop parsing if we reach an empty line or a line that does not look like a table row
-    if (line === "" || (!line.includes("|") && line !== "")) {
+    if (line === "" || !line.includes("|")) {
       break;
     }
 
