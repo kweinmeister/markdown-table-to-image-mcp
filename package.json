@@ -9,8 +9,9 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "test": "vitest run",
-    "lint": "biome check .",
-    "format": "biome check --write ."
+    "lint": "biome ci .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome format --write ."
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
