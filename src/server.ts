@@ -1,4 +1,4 @@
-import { FastMCP } from "fastmcp";
+import { FastMCP, imageContent } from "fastmcp";
 import { generateCacheKey, getCachedImage, setCachedImage } from "./cache.js";
 import { parseMarkdownTable } from "./parser.js";
 import { renderTableToPng } from "./satori.js";
@@ -37,15 +37,7 @@ server.addTool({
         console.error(
           `[markdown-table-to-image-mcp] Render success (cache HIT): theme=${args.theme ?? "glassmorphism"}, aspect=${args.aspectRatio ?? "auto"}, scale=${args.scale ?? 2}`,
         );
-        return {
-          content: [
-            {
-              type: "image" as const,
-              data: cachedBuffer.toString("base64"),
-              mimeType: "image/png",
-            },
-          ],
-        };
+        return await imageContent({ buffer: cachedBuffer });
       }
 
       // 3. Render PNG
@@ -66,15 +58,7 @@ server.addTool({
         `[markdown-table-to-image-mcp] Render success (cache MISS): theme=${args.theme ?? "glassmorphism"}, aspect=${args.aspectRatio ?? "auto"}, scale=${args.scale ?? 2}`,
       );
 
-      return {
-        content: [
-          {
-            type: "image" as const,
-            data: pngBuffer.toString("base64"),
-            mimeType: "image/png",
-          },
-        ],
-      };
+      return await imageContent({ buffer: pngBuffer });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(
