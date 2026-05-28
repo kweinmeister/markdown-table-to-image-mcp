@@ -110,8 +110,7 @@ npm run build      # Compile to dist/ for production
 ## Tech Stack
 
 - [FastMCP](https://github.com/punkpeye/fastmcp) — MCP server framework (stdio transport)
-- [Satori](https://github.com/vercel/satori) — JSX → SVG renderer
-- [Resvg](https://github.com/yisibl/resvg-js) — SVG → PNG rasterizer
+- [Takumi](https://github.com/kane50613/takumi) — Rust-based JSX → PNG renderer
 - [Zod](https://github.com/colinhacks/zod) — Runtime schema validation
 - [Biome](https://biomejs.dev/) — Linting and formatting
 - [Vitest](https://vitest.dev/) — Test runner

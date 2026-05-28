@@ -1,16 +1,11 @@
-import type React from "react";
+import type { CSSProperties } from "react";
 import { getViewportDimensions } from "./dimensions.js";
-import type { AspectRatio, ParsedTable, TableTheme } from "./schemas.js";
+import type { ParsedTable, RenderOptions } from "./schemas.js";
 import { themeStyles } from "./themes.js";
 
-export interface RendererOptions {
+export type RendererOptions = Partial<Omit<RenderOptions, "markdown" | "scale">> & {
   table: ParsedTable;
-  title?: string;
-  theme?: TableTheme;
-  aspectRatio?: AspectRatio;
-  customWidth?: number;
-  transparentBackground?: boolean;
-}
+};
 
 export function TableRenderer({
   table,
@@ -25,8 +20,8 @@ export function TableRenderer({
 
   const { headers, rows, alignments } = table;
 
-  // Helper to get alignment styles that Satori natively understands
-  const getAlignStyles = (align: "left" | "center" | "right"): React.CSSProperties => {
+  // Helper to get alignment styles that Takumi natively understands
+  const getAlignStyles = (align: "left" | "center" | "right"): CSSProperties => {
     return {
       justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
       textAlign: align,
@@ -47,7 +42,7 @@ export function TableRenderer({
         <div style={style.thRow}>
           {headers.map((header, idx) => {
             const align = alignments[idx] || "left";
-            const cellWidthStyle: React.CSSProperties = {
+            const cellWidthStyle: CSSProperties = {
               flex: 1,
               minWidth: 0,
               overflow: "hidden",
@@ -69,7 +64,7 @@ export function TableRenderer({
           <div key={`row-${rowIdx}`} style={style.tdRow}>
             {row.map((cell, colIdx) => {
               const align = alignments[colIdx] || "left";
-              const cellWidthStyle: React.CSSProperties = {
+              const cellWidthStyle: CSSProperties = {
                 flex: 1,
                 minWidth: 0,
                 ...style.td,
@@ -90,7 +85,7 @@ export function TableRenderer({
 
   // Render wrapped in Canvas container if not "auto" or if fixed layout is needed
   if (aspectRatio !== "auto") {
-    const canvasStyle: React.CSSProperties = {
+    const canvasStyle: CSSProperties = {
       ...style.canvas,
       width: dimensions.width,
       height: dimensions.height,
@@ -98,10 +93,9 @@ export function TableRenderer({
     return <div style={canvasStyle}>{CardContent}</div>;
   }
 
-  // Auto sizing container just wraps card with canvas bg
-  // Destructure to omit height key dynamically, preventing Satori's parser from throwing undefined trim crashes
-  const { height: _, ...canvasWithoutHeight } = style.canvas;
-  const autoCanvasStyle: React.CSSProperties = {
+  // Auto sizing: destructure height out so Takumi infers it from content
+  const { height: _height, ...canvasWithoutHeight } = style.canvas;
+  const autoCanvasStyle: CSSProperties = {
     ...canvasWithoutHeight,
     width: dimensions.width,
     padding: "24px",
