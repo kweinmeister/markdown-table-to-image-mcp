@@ -1,9 +1,8 @@
-import type React from "react";
+import type { CSSProperties } from "react";
 import type { TableTheme } from "./schemas.js";
 
-// Define a strict structure for theme styles to enable full type checking
 export type ThemeParts = "canvas" | "card" | "title" | "table" | "thRow" | "th" | "tdRow" | "td";
-export type ThemeStyle = Record<ThemeParts, React.CSSProperties>;
+export type ThemeStyle = Record<ThemeParts, CSSProperties>;
 
 // Theme Style Map (Fully typed, no inline casts needed)
 export const themeStyles = {

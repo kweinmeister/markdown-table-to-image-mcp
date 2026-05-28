@@ -1,8 +1,8 @@
 import { FastMCP, imageContent } from "fastmcp";
 import { generateCacheKey, getCachedImage, setCachedImage } from "./cache.js";
 import { parseMarkdownTable } from "./parser.js";
-import { renderTableToPng } from "./satori.js";
 import { RenderOptionsSchema } from "./schemas.js";
+import { renderTableToPng } from "./takumi.js";
 
 // Initialize the FastMCP server instance
 const server = new FastMCP({

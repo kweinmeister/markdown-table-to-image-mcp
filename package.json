@@ -1,7 +1,7 @@
 {
   "name": "markdown-table-to-image-mcp",
   "version": "1.0.0",
-  "description": "FastMCP server that converts markdown tables to beautiful images using Satori and Resvg",
+  "description": "FastMCP server that converts markdown tables to beautiful images using Takumi",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
@@ -14,18 +14,15 @@
     "format": "biome format --write ."
   },
   "dependencies": {
-    "@resvg/resvg-js": "^2.6.2",
     "fastmcp": "^4.0.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "satori": "^0.26.0",
+    "takumi-js": "^1.6.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
     "@types/node": "^25.9.1",
     "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
     "typescript": "^6.0.3",

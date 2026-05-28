@@ -1,15 +1,7 @@
 import crypto from "node:crypto";
-import type { AspectRatio, TableTheme } from "./schemas.js";
+import type { RendererOptions } from "./renderer.js";
 
-export interface CacheKeyPayload {
-  markdown: string;
-  title?: string;
-  theme?: TableTheme;
-  aspectRatio?: AspectRatio;
-  scale?: number;
-  customWidth?: number;
-  transparentBackground?: boolean;
-}
+export type CacheKeyPayload = Omit<RendererOptions, "table"> & { markdown: string; scale?: number };
 
 // Maximum number of items to hold in cache to prevent DoS memory exhaustion
 const MAX_CACHE_SIZE = 100;
