@@ -16,7 +16,7 @@ A [FastMCP](https://github.com/punkpeye/fastmcp) server that converts Markdown t
 ### 1. Clone and build
 
 ```bash
-git clone https://github.com/<your-username>/markdown-table-to-image-mcp.git
+git clone https://github.com/kweinmeister/markdown-table-to-image-mcp.git
 cd markdown-table-to-image-mcp
 npm ci
 npm run build
