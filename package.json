@@ -16,7 +16,7 @@
   "dependencies": {
     "fastmcp": "^4.16.12",
     "react": "^19.2.8",
-    "takumi-js": "^2.13.0",
+    "takumi-js": "^2.13.5",
     "zod": "^4.5.4"
   },
   "devDependencies": {
