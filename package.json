@@ -14,7 +14,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
-    "fastmcp": "^4.20.11",
+    "fastmcp": "^4.20.14",
     "react": "^19.2.8",
     "takumi-js": "^2.13.5",
     "zod": "^4.6.2"
