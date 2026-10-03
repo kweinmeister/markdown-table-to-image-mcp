@@ -15,14 +15,14 @@
   },
   "dependencies": {
     "fastmcp": "^4.20.11",
-    "react": "^19.2.8",
+    "react": "^19.3.0",
     "takumi-js": "^2.13.5",
     "zod": "^4.6.2"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.13",
     "@types/node": "^26.5.1",
-    "@types/react": "^19.2.18",
+    "@types/react": "^19.3.0",
     "tsup": "^8.3.5",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
