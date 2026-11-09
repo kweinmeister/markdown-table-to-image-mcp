@@ -1,9 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["src/**/*", "biome.json", "package.json", "tsconfig.json", "tsup.config.ts"]
   },
   "formatter": {
     "enabled": true,
@@ -13,7 +16,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended"
+      "recommended": true
     }
   },
   "assist": {

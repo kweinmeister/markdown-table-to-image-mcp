@@ -1,7 +1,12 @@
 import crypto from "node:crypto";
 import type { RendererOptions } from "./renderer.js";
+import type { ImageFormat } from "./schemas.js";
 
-export type CacheKeyPayload = Omit<RendererOptions, "table"> & { markdown: string; scale?: number };
+export type CacheKeyPayload = Omit<RendererOptions, "table"> & {
+  markdown: string;
+  scale?: number;
+  format?: ImageFormat;
+};
 
 // Maximum number of items to hold in cache to prevent DoS memory exhaustion
 const MAX_CACHE_SIZE = 100;
@@ -16,18 +21,24 @@ export function generateCacheKey(payload: CacheKeyPayload): string {
   const serialized = JSON.stringify({
     markdown: payload.markdown,
     title: payload.title ?? "",
+    subtitle: payload.subtitle ?? "",
+    footer: payload.footer ?? "",
     theme: payload.theme ?? "glassmorphism",
     aspectRatio: payload.aspectRatio ?? "auto",
     scale: payload.scale ?? 2,
     customWidth: payload.customWidth ?? 800,
     transparentBackground: payload.transparentBackground ?? false,
+    transparentCanvas: payload.transparentCanvas ?? false,
+    zebraStriping: payload.zebraStriping ?? true,
+    statusBadges: payload.statusBadges ?? true,
+    format: payload.format ?? "png",
   });
 
   return crypto.createHash("sha256").update(serialized).digest("hex");
 }
 
 /**
- * Retrieves the cached PNG buffer if present.
+ * Retrieves the cached image buffer if present.
  */
 export function getCachedImage(key: string): Buffer | undefined {
   const item = cacheStore.get(key);
@@ -41,7 +52,7 @@ export function getCachedImage(key: string): Buffer | undefined {
 }
 
 /**
- * Caches the PNG buffer, enforcing boundaries by removing the oldest items if the size exceeds MAX_CACHE_SIZE.
+ * Caches the image buffer, enforcing boundaries by removing the oldest items if the size exceeds MAX_CACHE_SIZE.
  */
 export function setCachedImage(key: string, value: Buffer): void {
   // If already present, delete it first to refresh position

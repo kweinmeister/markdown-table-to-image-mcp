@@ -1,8 +1,10 @@
+import fs from "node:fs";
+import path from "node:path";
 import { FastMCP, imageContent } from "fastmcp";
 import { generateCacheKey, getCachedImage, setCachedImage } from "./cache.js";
 import { parseMarkdownTable } from "./parser.js";
 import { RenderOptionsSchema } from "./schemas.js";
-import { renderTableToPng } from "./takumi.js";
+import { renderTableToImage } from "./takumi.js";
 
 // Initialize the FastMCP server instance
 const server = new FastMCP({
@@ -14,8 +16,14 @@ const server = new FastMCP({
 server.addTool({
   name: "markdown_table_to_image",
   description:
-    "Converts a raw Markdown table string into a beautifully styled, high-DPI publication-ready PNG image card.",
+    "Converts a raw Markdown table string into a beautifully styled, high-DPI publication-ready image card (PNG, WebP, or JPEG). Supports inline formatting, status badges, custom themes, subtitles, and direct file saving.",
   parameters: RenderOptionsSchema,
+  annotations: {
+    title: "Markdown Table to Image",
+    idempotentHint: true,
+    openWorldHint: false,
+    destructiveHint: false,
+  },
   execute: async (args) => {
     try {
       // 1. Safely parse the table
@@ -25,40 +33,72 @@ server.addTool({
       const cacheKey = generateCacheKey({
         markdown: args.markdown,
         title: args.title,
+        subtitle: args.subtitle,
+        footer: args.footer,
         theme: args.theme,
         aspectRatio: args.aspectRatio,
         scale: args.scale,
         customWidth: args.customWidth,
         transparentBackground: args.transparentBackground,
+        transparentCanvas: args.transparentCanvas,
+        zebraStriping: args.zebraStriping,
+        statusBadges: args.statusBadges,
+        format: args.format,
       });
 
-      const cachedBuffer = getCachedImage(cacheKey);
-      if (cachedBuffer) {
+      let imageBuffer = getCachedImage(cacheKey);
+      if (imageBuffer) {
         console.error(
-          `[markdown-table-to-image-mcp] Render success (cache HIT): theme=${args.theme ?? "glassmorphism"}, aspect=${args.aspectRatio ?? "auto"}, scale=${args.scale ?? 2}`,
+          `[markdown-table-to-image-mcp] Render success (cache HIT): theme=${args.theme ?? "glassmorphism"}, format=${args.format ?? "png"}, aspect=${args.aspectRatio ?? "auto"}`,
         );
-        return await imageContent({ buffer: cachedBuffer });
+      } else {
+        // 3. Render Image (PNG / WebP / JPEG)
+        imageBuffer = await renderTableToImage({
+          table,
+          title: args.title,
+          subtitle: args.subtitle,
+          footer: args.footer,
+          theme: args.theme,
+          aspectRatio: args.aspectRatio,
+          scale: args.scale,
+          customWidth: args.customWidth,
+          transparentBackground: args.transparentBackground,
+          transparentCanvas: args.transparentCanvas,
+          zebraStriping: args.zebraStriping,
+          statusBadges: args.statusBadges,
+          format: args.format,
+        });
+
+        // 4. Cache result
+        setCachedImage(cacheKey, imageBuffer);
+
+        console.error(
+          `[markdown-table-to-image-mcp] Render success (cache MISS): theme=${args.theme ?? "glassmorphism"}, format=${args.format ?? "png"}, aspect=${args.aspectRatio ?? "auto"}`,
+        );
       }
 
-      // 3. Render PNG
-      const pngBuffer = await renderTableToPng({
-        table,
-        title: args.title,
-        theme: args.theme,
-        aspectRatio: args.aspectRatio,
-        scale: args.scale,
-        customWidth: args.customWidth,
-        transparentBackground: args.transparentBackground,
-      });
+      // If outputPath is provided, write to disk
+      if (args.outputPath) {
+        const resolvedPath = path.resolve(args.outputPath);
+        fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
+        fs.writeFileSync(resolvedPath, imageBuffer);
+      }
 
-      // 4. Cache result
-      setCachedImage(cacheKey, pngBuffer);
+      const imgContent = await imageContent({ buffer: imageBuffer });
 
-      console.error(
-        `[markdown-table-to-image-mcp] Render success (cache MISS): theme=${args.theme ?? "glassmorphism"}, aspect=${args.aspectRatio ?? "auto"}, scale=${args.scale ?? 2}`,
-      );
+      if (args.outputPath) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Image successfully saved to ${args.outputPath}`,
+            },
+            imgContent,
+          ],
+        };
+      }
 
-      return await imageContent({ buffer: pngBuffer });
+      return imgContent;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(

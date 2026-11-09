@@ -5,6 +5,7 @@ import React from "react";
 import { render } from "takumi-js";
 import { getViewportDimensions } from "./dimensions.js";
 import { type RendererOptions, TableRenderer } from "./renderer.js";
+import type { ImageFormat } from "./schemas.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,30 +42,41 @@ function loadFontData(fontName: string): Buffer {
 
 function getFonts() {
   return [
-    { name: "Roboto", data: () => loadFontData("Roboto-Regular.ttf") },
-    { name: "Roboto", data: () => loadFontData("Roboto-Bold.ttf") },
+    { name: "Roboto", data: () => loadFontData("Roboto-Regular.ttf"), weight: 400 },
+    { name: "Roboto", data: () => loadFontData("Roboto-Bold.ttf"), weight: 700 },
+    { name: "Roboto Mono", data: () => loadFontData("RobotoMono-Regular.ttf"), weight: 400 },
   ];
 }
 
-export interface RenderToPngOptions extends RendererOptions {
+export interface RenderToImageOptions extends RendererOptions {
   scale?: number;
+  format?: ImageFormat;
+  outputPath?: string;
 }
 
-export async function renderTableToPng(options: RenderToPngOptions): Promise<Buffer> {
+export type RenderToPngOptions = RenderToImageOptions;
+
+export async function renderTableToImage(options: RenderToImageOptions): Promise<Buffer> {
   const scale = options.scale ?? 2;
   const theme = options.theme ?? "glassmorphism";
   const aspectRatio = options.aspectRatio ?? "auto";
   const customWidth = options.customWidth ?? 800;
+  const format = options.format ?? "png";
 
   const dimensions = getViewportDimensions(aspectRatio, customWidth);
 
   const element = React.createElement(TableRenderer, {
     table: options.table,
     title: options.title,
+    subtitle: options.subtitle,
+    footer: options.footer,
     theme,
     aspectRatio,
     customWidth,
     transparentBackground: options.transparentBackground,
+    transparentCanvas: options.transparentCanvas,
+    zebraStriping: options.zebraStriping,
+    statusBadges: options.statusBadges,
   });
 
   const fonts = getFonts();
@@ -74,8 +86,19 @@ export async function renderTableToPng(options: RenderToPngOptions): Promise<Buf
     height: dimensions.height ? dimensions.height * scale : undefined,
     devicePixelRatio: scale,
     fonts,
-    format: "png",
+    format,
   });
 
-  return Buffer.from(image);
+  const buffer = Buffer.from(image);
+
+  if (options.outputPath) {
+    const resolvedPath = path.resolve(options.outputPath);
+    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
+    fs.writeFileSync(resolvedPath, buffer);
+  }
+
+  return buffer;
 }
+
+// Backward-compatible alias for existing tests and callers
+export const renderTableToPng = renderTableToImage;

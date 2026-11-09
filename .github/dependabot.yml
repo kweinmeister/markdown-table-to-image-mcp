@@ -20,6 +20,11 @@ updates:
       prefix: "chore"
       include: "scope"
     groups:
+      dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+          - "minor"
       dev-dependencies:
         dependency-type: "development"
         update-types:

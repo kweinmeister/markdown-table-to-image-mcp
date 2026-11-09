@@ -1,10 +1,170 @@
 import type { ParsedTable } from "./schemas.js";
 
+export type InlineTokenType =
+  | "text"
+  | "bold"
+  | "italic"
+  | "code"
+  | "strike"
+  | "strikethrough"
+  | "link";
+
+export interface InlineToken {
+  type: InlineTokenType;
+  content: string;
+  href?: string;
+}
+
+export type StatusBadgeVariant = "success" | "warning" | "error" | "info" | "neutral";
+
+export interface StatusBadge {
+  type: StatusBadgeVariant;
+  label: string;
+}
+
 /**
  * Clean cell content by handling unescaping of markdown characters like pipes.
  */
 export function cleanCell(val: string): string {
   return val.replace(/\\\|/g, "|").trim();
+}
+
+/**
+ * Tokenizes a cell string into inline Markdown spans (`**bold**`, `*italic*`, `` `code` ``, `~~strike~~`, `[text](url)`).
+ */
+export function parseInlineMarkdown(text: string): InlineToken[] {
+  if (!text) return [];
+
+  const tokens: InlineToken[] = [];
+  // Match inline code, bold (** or __), strikethrough (~~), links ([text](url)), or italic (* or _)
+  const pattern =
+    /`([^`]+)`|\*\*([^*]+)\*\*|__([^_]+)__|~~([^~]+)~~|\[([^\]]+)\]\(([^)]+)\)|(?<!\*)\*([^*]+)\*(?!\*)|(?<!_)_([^_]+)_(?!_)/g;
+
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = pattern.exec(text);
+
+  while (match !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({
+        type: "text",
+        content: text.slice(lastIndex, match.index),
+      });
+    }
+
+    if (match[1] !== undefined) {
+      tokens.push({ type: "code", content: match[1] });
+    } else if (match[2] !== undefined || match[3] !== undefined) {
+      tokens.push({ type: "bold", content: match[2] ?? match[3] });
+    } else if (match[4] !== undefined) {
+      tokens.push({ type: "strikethrough", content: match[4] });
+    } else if (match[5] !== undefined && match[6] !== undefined) {
+      tokens.push({ type: "link", content: match[5], href: match[6] });
+    } else if (match[7] !== undefined || match[8] !== undefined) {
+      tokens.push({ type: "italic", content: match[7] ?? match[8] });
+    }
+
+    lastIndex = pattern.lastIndex;
+    match = pattern.exec(text);
+  }
+
+  if (lastIndex < text.length) {
+    tokens.push({
+      type: "text",
+      content: text.slice(lastIndex),
+    });
+  }
+
+  return tokens;
+}
+
+const STATUS_BADGE_MAP: Record<string, StatusBadgeVariant> = {
+  active: "success",
+  healthy: "success",
+  online: "success",
+  passed: "success",
+  pass: "success",
+  success: "success",
+  ready: "success",
+  enabled: "success",
+  completed: "success",
+  complete: "success",
+  done: "success",
+  live: "success",
+  "✓": "success",
+  "✔": "success",
+  pending: "warning",
+  warning: "warning",
+  warn: "warning",
+  degraded: "warning",
+  maintenance: "warning",
+  queued: "warning",
+  beta: "warning",
+  experimental: "warning",
+  error: "error",
+  failed: "error",
+  fail: "error",
+  offline: "error",
+  critical: "error",
+  blocked: "error",
+  down: "error",
+  rejected: "error",
+  deprecated: "error",
+  "✗": "error",
+  info: "info",
+  "in progress": "info",
+  running: "info",
+  syncing: "info",
+  deploying: "info",
+  inactive: "neutral",
+  disabled: "neutral",
+  skipped: "neutral",
+  draft: "neutral",
+  archived: "neutral",
+};
+
+/**
+ * Checks whether a single cell value represents a semantic status keyword that can be rendered as a pill badge.
+ */
+export function detectStatusBadge(cell: string): StatusBadge | null {
+  const trimmed = cell.trim();
+  const normalized = trimmed.toLowerCase();
+  const variant = STATUS_BADGE_MAP[normalized];
+  if (!variant) return null;
+  return {
+    type: variant,
+    label: trimmed,
+  };
+}
+
+/**
+ * Computes smart CSS Grid column track sizing (`gridTemplateColumns`) based on cell content lengths.
+ */
+export function computeColumnTracks(table: ParsedTable): string {
+  const colCount = table.headers.length;
+  if (colCount <= 1) return "1fr";
+
+  const maxLengths = table.headers.map((header, colIdx) => {
+    let maxLen = header.length;
+    for (const row of table.rows) {
+      const cell = row[colIdx] ?? "";
+      // Strip basic markdown formatting syntax when estimating visual character width
+      const visibleLen = cell.replace(/[*_~`]/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").length;
+      if (visibleLen > maxLen) {
+        maxLen = visibleLen;
+      }
+    }
+    return Math.max(maxLen, 3);
+  });
+
+  // Convert character lengths into proportional fr weights with sensible min/max clamping
+  // Short columns (<= 14 chars) size compactly; longer narrative columns scale dampened via sqrt/linear blend
+  const weights = maxLengths.map((len) => {
+    if (len <= 10) return 0.75;
+    if (len <= 18) return 1.0;
+    return Number(Math.min(3.2, 1.0 + (len - 18) * 0.055).toFixed(2));
+  });
+
+  return weights.map((w) => `${w}fr`).join(" ");
 }
 
 /**
