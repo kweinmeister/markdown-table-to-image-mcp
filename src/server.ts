@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { FastMCP, imageContent } from "fastmcp";
 import { generateCacheKey, getCachedImage, setCachedImage } from "./cache.js";
+import { getViewportDimensions } from "./dimensions.js";
 import { parseMarkdownTable } from "./parser.js";
 import { RenderOptionsSchema } from "./schemas.js";
 import { renderTableToImage } from "./takumi.js";
@@ -82,23 +83,29 @@ server.addTool({
         const resolvedPath = path.resolve(args.outputPath);
         fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
         fs.writeFileSync(resolvedPath, imageBuffer);
-      }
 
-      const imgContent = await imageContent({ buffer: imageBuffer });
+        const dimensions = getViewportDimensions(
+          args.aspectRatio ?? "auto",
+          args.customWidth ?? 800,
+        );
+        const scale = args.scale ?? 2;
+        const pixelW = dimensions.width * scale;
+        const pixelH = dimensions.height ? dimensions.height * scale : undefined;
+        const dimsStr = pixelH ? `${pixelW}x${pixelH}` : `${pixelW}px width (auto height)`;
 
-      if (args.outputPath) {
+        const imgContent = await imageContent({ buffer: imageBuffer });
         return {
           content: [
             {
               type: "text" as const,
-              text: `Image successfully saved to ${args.outputPath}`,
+              text: `Image successfully saved to ${args.outputPath} (${imageBuffer.length} bytes, ${dimsStr})`,
             },
             imgContent,
           ],
         };
       }
 
-      return imgContent;
+      return await imageContent({ buffer: imageBuffer });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(

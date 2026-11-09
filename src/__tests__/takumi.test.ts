@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { parseMarkdownTable } from "../parser.js";
 import { renderTableToImage, renderTableToPng } from "../takumi.js";
@@ -160,30 +157,6 @@ describe("Takumi Render Engine", () => {
     expect(jpegBuffer[0]).toBe(0xff);
     expect(jpegBuffer[1]).toBe(0xd8);
     expect(jpegBuffer[2]).toBe(0xff);
-  });
-
-  it("should save rendered image to outputPath when specified", async () => {
-    const table = parseMarkdownTable(`
-| Tool | Status |
-| --- | --- |
-| Vitest | Active |
-    `);
-
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "mcp-test-"));
-    const tmpFile = path.join(tmpDir, "subfolder", "table.png");
-
-    try {
-      const buffer = await renderTableToImage({
-        table,
-        outputPath: tmpFile,
-      });
-
-      expect(fs.existsSync(tmpFile)).toBe(true);
-      const fileData = fs.readFileSync(tmpFile);
-      expect(fileData).toEqual(buffer);
-    } finally {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
-    }
   });
 
   it("should render rich inline markdown, status badges, and zebra rows", async () => {

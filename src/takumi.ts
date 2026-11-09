@@ -51,7 +51,6 @@ function getFonts() {
 export interface RenderToImageOptions extends RendererOptions {
   scale?: number;
   format?: ImageFormat;
-  outputPath?: string;
 }
 
 export type RenderToPngOptions = RenderToImageOptions;
@@ -89,15 +88,7 @@ export async function renderTableToImage(options: RenderToImageOptions): Promise
     format,
   });
 
-  const buffer = Buffer.from(image);
-
-  if (options.outputPath) {
-    const resolvedPath = path.resolve(options.outputPath);
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, buffer);
-  }
-
-  return buffer;
+  return Buffer.from(image);
 }
 
 // Backward-compatible alias for existing tests and callers

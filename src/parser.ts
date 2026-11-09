@@ -1,6 +1,6 @@
 import type { ParsedTable, StatusBadgeVariant } from "./schemas.js";
 
-export type FormattedTokenType = "text" | "bold" | "italic" | "code" | "strike" | "strikethrough";
+export type FormattedTokenType = "text" | "bold" | "italic" | "code" | "strikethrough";
 
 export type InlineTokenType = FormattedTokenType | "link";
 

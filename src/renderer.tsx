@@ -38,6 +38,7 @@ export function TableRenderer({
       width: "100%",
       display: "flex",
       justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
+      fontVariantNumeric: align === "right" ? "tabular-nums" : undefined,
     };
   };
 
@@ -70,7 +71,6 @@ export function TableRenderer({
                   {token.content}
                 </em>
               );
-            case "strike":
             case "strikethrough":
               return (
                 <span key={key} style={{ textDecoration: "line-through", opacity: 0.7 }}>
@@ -87,6 +87,8 @@ export function TableRenderer({
               return (
                 <span
                   key={key}
+                  data-href={token.href}
+                  title={token.href}
                   style={{ textDecoration: "underline", color: "inherit", opacity: 0.9 }}
                 >
                   {token.content}
