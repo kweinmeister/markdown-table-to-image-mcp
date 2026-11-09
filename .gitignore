@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 # Project specific
 test-output/
 .DS_Store
+scripts/
