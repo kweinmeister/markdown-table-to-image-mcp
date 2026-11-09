@@ -86,7 +86,7 @@ export async function renderTableToImage(options: RenderToImageOptions): Promise
     devicePixelRatio: scale,
     fonts,
     format,
-  });
+  } as Parameters<typeof render>[1]);
 
   return Buffer.from(image);
 }
