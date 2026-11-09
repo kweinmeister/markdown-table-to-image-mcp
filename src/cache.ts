@@ -1,12 +1,8 @@
 import crypto from "node:crypto";
-import type { RendererOptions } from "./renderer.js";
-import type { ImageFormat } from "./schemas.js";
+import type { z } from "zod";
+import type { RenderOptionsSchema } from "./schemas.js";
 
-export type CacheKeyPayload = Omit<RendererOptions, "table"> & {
-  markdown: string;
-  scale?: number;
-  format?: ImageFormat;
-};
+export type CacheKeyPayload = Readonly<Omit<z.input<typeof RenderOptionsSchema>, "outputPath">>;
 
 // Maximum number of items to hold in cache to prevent DoS memory exhaustion
 const MAX_CACHE_SIZE = 100;

@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
-import type { TableTheme } from "./schemas.js";
+import type { StatusBadgeVariant, TableTheme } from "./schemas.js";
 
-export type StatusBadgeType = "success" | "warning" | "error" | "info" | "neutral";
+export type StatusBadgeType = StatusBadgeVariant;
 
 export interface ThemeStyle {
   canvas: CSSProperties;
@@ -16,7 +16,7 @@ export interface ThemeStyle {
   zebraRow: CSSProperties;
   td: CSSProperties;
   code: CSSProperties;
-  badges: Record<StatusBadgeType, CSSProperties>;
+  badges: Record<StatusBadgeVariant, CSSProperties>;
 }
 
 const baseBadgeStyle: CSSProperties = {
@@ -30,8 +30,8 @@ const baseBadgeStyle: CSSProperties = {
   fontFamily: "Roboto",
 };
 
-// Theme Style Map (Fully typed, no inline casts needed)
-export const themeStyles: Record<TableTheme, ThemeStyle> = {
+// Theme Style Map (Fully typed with satisfies for exact theme key preservation)
+export const themeStyles = {
   glassmorphism: {
     canvas: {
       display: "flex",
@@ -801,4 +801,4 @@ export const themeStyles: Record<TableTheme, ThemeStyle> = {
       },
     },
   },
-};
+} satisfies Record<TableTheme, ThemeStyle>;

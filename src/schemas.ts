@@ -19,14 +19,18 @@ export const ImageFormatSchema = z.enum(["png", "webp", "jpeg"]);
 
 export type ImageFormat = z.infer<typeof ImageFormatSchema>;
 
+export const StatusBadgeVariantSchema = z.enum(["success", "warning", "error", "info", "neutral"]);
+
+export type StatusBadgeVariant = z.infer<typeof StatusBadgeVariantSchema>;
+
 // ============================================================================
 // Internal Engine Data Types
 // ============================================================================
 
 export interface ParsedTable {
-  headers: string[];
-  rows: string[][];
-  alignments: ("left" | "center" | "right")[];
+  readonly headers: readonly string[];
+  readonly rows: readonly (readonly string[])[];
+  readonly alignments: readonly ("left" | "center" | "right")[];
 }
 
 // ============================================================================

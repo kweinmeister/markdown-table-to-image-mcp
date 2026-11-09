@@ -2,7 +2,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { getViewportDimensions } from "./dimensions.js";
 import { computeColumnTracks, detectStatusBadge, parseInlineMarkdown } from "./parser.js";
 import type { ParsedTable, RenderOptions } from "./schemas.js";
-import { type StatusBadgeType, themeStyles } from "./themes.js";
+import { themeStyles } from "./themes.js";
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled token type: ${JSON.stringify(value)}`);
+}
 
 export type RendererOptions = Partial<Omit<RenderOptions, "markdown" | "scale">> & {
   table: ParsedTable;
@@ -41,7 +45,7 @@ export function TableRenderer({
     if (statusBadges) {
       const badge = detectStatusBadge(cell);
       if (badge) {
-        const badgeStyle = style.badges[badge.type as StatusBadgeType] ?? style.badges.neutral;
+        const badgeStyle = style.badges[badge.type] ?? style.badges.neutral;
         return <span style={badgeStyle}>{badge.label}</span>;
       }
     }
@@ -52,6 +56,8 @@ export function TableRenderer({
         {tokens.map((token, idx) => {
           const key = `token-${idx}`;
           switch (token.type) {
+            case "text":
+              return <span key={key}>{token.content}</span>;
             case "bold":
               return (
                 <strong key={key} style={{ fontWeight: 700 }}>
@@ -87,7 +93,7 @@ export function TableRenderer({
                 </span>
               );
             default:
-              return <span key={key}>{token.content}</span>;
+              return assertNever(token);
           }
         })}
       </span>

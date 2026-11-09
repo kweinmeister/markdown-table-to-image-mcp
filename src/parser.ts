@@ -1,25 +1,18 @@
-import type { ParsedTable } from "./schemas.js";
+import type { ParsedTable, StatusBadgeVariant } from "./schemas.js";
 
-export type InlineTokenType =
-  | "text"
-  | "bold"
-  | "italic"
-  | "code"
-  | "strike"
-  | "strikethrough"
-  | "link";
+export type FormattedTokenType = "text" | "bold" | "italic" | "code" | "strike" | "strikethrough";
 
-export interface InlineToken {
-  type: InlineTokenType;
-  content: string;
-  href?: string;
-}
+export type InlineTokenType = FormattedTokenType | "link";
 
-export type StatusBadgeVariant = "success" | "warning" | "error" | "info" | "neutral";
+export type InlineToken =
+  | { readonly type: FormattedTokenType; readonly content: string }
+  | { readonly type: "link"; readonly content: string; readonly href: string };
+
+export type { StatusBadgeVariant };
 
 export interface StatusBadge {
-  type: StatusBadgeVariant;
-  label: string;
+  readonly type: StatusBadgeVariant;
+  readonly label: string;
 }
 
 /**
