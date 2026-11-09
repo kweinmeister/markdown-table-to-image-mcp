@@ -9,4 +9,7 @@ export default defineConfig({
   minify: false,
   sourcemap: true,
   publicDir: "src/assets",
+  banner: {
+    js: "#!/usr/bin/env node",
+  },
 });

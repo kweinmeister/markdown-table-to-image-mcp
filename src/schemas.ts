@@ -6,6 +6,7 @@ export const TableThemeSchema = z.enum([
   "minimalist-light",
   "emerald-glow",
   "synthwave",
+  "editorial",
 ]);
 
 export type TableTheme = z.infer<typeof TableThemeSchema>;
@@ -14,14 +15,22 @@ export const AspectRatioSchema = z.enum(["auto", "16:9", "1:1", "9:16"]);
 
 export type AspectRatio = z.infer<typeof AspectRatioSchema>;
 
+export const ImageFormatSchema = z.enum(["png", "webp", "jpeg"]);
+
+export type ImageFormat = z.infer<typeof ImageFormatSchema>;
+
+export const StatusBadgeVariantSchema = z.enum(["success", "warning", "error", "info", "neutral"]);
+
+export type StatusBadgeVariant = z.infer<typeof StatusBadgeVariantSchema>;
+
 // ============================================================================
 // Internal Engine Data Types
 // ============================================================================
 
 export interface ParsedTable {
-  headers: string[];
-  rows: string[][];
-  alignments: ("left" | "center" | "right")[];
+  readonly headers: readonly string[];
+  readonly rows: readonly (readonly string[])[];
+  readonly alignments: readonly ("left" | "center" | "right")[];
 }
 
 // ============================================================================
@@ -40,6 +49,16 @@ export const RenderOptionsSchema = z.object({
     .max(200)
     .optional()
     .describe("Optional title text displayed above the table card."),
+  subtitle: z
+    .string()
+    .max(300)
+    .optional()
+    .describe("Optional subtitle or description displayed directly beneath the title."),
+  footer: z
+    .string()
+    .max(300)
+    .optional()
+    .describe("Optional footer or source attribution displayed below the table."),
   theme: TableThemeSchema.optional()
     .default("glassmorphism")
     .describe("Visual theme style for the table card background, colors, and text styling."),
@@ -69,6 +88,35 @@ export const RenderOptionsSchema = z.object({
     .default(false)
     .describe(
       "When true, renders the card panel background as transparent. The canvas retains its theme background styling.",
+    ),
+  transparentCanvas: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "When true, renders the outer canvas background as completely transparent so the card can be overlaid onto slides, videos, or custom backgrounds.",
+    ),
+  zebraStriping: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("When true, applies subtle alternating background tints to even data rows."),
+  statusBadges: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe(
+      "When true, automatically renders common status keywords (e.g. Active, Pending, Error) as styled semantic badges.",
+    ),
+  format: ImageFormatSchema.optional()
+    .default("png")
+    .describe("Output image format: 'png' (default), 'webp', or 'jpeg'."),
+  outputPath: z
+    .string()
+    .max(1024)
+    .optional()
+    .describe(
+      "Optional file path on disk where the rendered image should be saved directly (parent directories are created automatically).",
     ),
 });
 

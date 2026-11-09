@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { cleanCell, isSeparatorRow, parseMarkdownTable } from "../parser.js";
+import {
+  cleanCell,
+  computeColumnTracks,
+  detectStatusBadge,
+  isSeparatorRow,
+  parseInlineMarkdown,
+  parseMarkdownTable,
+} from "../parser.js";
 
 describe("Markdown Table Parser", () => {
   describe("cleanCell", () => {
@@ -125,6 +132,77 @@ Val 1 | Val 2
       expect(() => parseMarkdownTable("| separator only |\n| --- |")).toThrow(
         "No valid data rows found in the table",
       );
+    });
+  });
+
+  describe("parseInlineMarkdown", () => {
+    it("should parse plain text without formatting", () => {
+      expect(parseInlineMarkdown("hello world")).toEqual([
+        { type: "text", content: "hello world" },
+      ]);
+    });
+
+    it("should parse bold, italic, code, strikethrough, and links", () => {
+      expect(parseInlineMarkdown("**bold**")).toEqual([{ type: "bold", content: "bold" }]);
+      expect(parseInlineMarkdown("*italic*")).toEqual([{ type: "italic", content: "italic" }]);
+      expect(parseInlineMarkdown("`code`")).toEqual([{ type: "code", content: "code" }]);
+      expect(parseInlineMarkdown("~~deleted~~")).toEqual([
+        { type: "strikethrough", content: "deleted" },
+      ]);
+      expect(parseInlineMarkdown("[Docs](https://example.com)")).toEqual([
+        { type: "link", content: "Docs", href: "https://example.com" },
+      ]);
+    });
+
+    it("should parse mixed inline tokens in a single string", () => {
+      const tokens = parseInlineMarkdown("Run `npm test` for **fast** results!");
+      expect(tokens).toEqual([
+        { type: "text", content: "Run " },
+        { type: "code", content: "npm test" },
+        { type: "text", content: " for " },
+        { type: "bold", content: "fast" },
+        { type: "text", content: " results!" },
+      ]);
+    });
+  });
+
+  describe("detectStatusBadge", () => {
+    it("should identify success status keywords", () => {
+      expect(detectStatusBadge("Active")).toEqual({ type: "success", label: "Active" });
+      expect(detectStatusBadge("PASSED")).toEqual({ type: "success", label: "PASSED" });
+      expect(detectStatusBadge("done")).toEqual({ type: "success", label: "done" });
+      expect(detectStatusBadge("✓")).toEqual({ type: "success", label: "✓" });
+    });
+
+    it("should identify warning, error, info, and neutral status keywords", () => {
+      expect(detectStatusBadge("Pending")).toEqual({ type: "warning", label: "Pending" });
+      expect(detectStatusBadge("FAILED")).toEqual({ type: "error", label: "FAILED" });
+      expect(detectStatusBadge("Error")).toEqual({ type: "error", label: "Error" });
+      expect(detectStatusBadge("In Progress")).toEqual({ type: "info", label: "In Progress" });
+      expect(detectStatusBadge("Draft")).toEqual({ type: "neutral", label: "Draft" });
+    });
+
+    it("should return null for non-status strings", () => {
+      expect(detectStatusBadge("Random text value")).toBeNull();
+      expect(detectStatusBadge("This is active now")).toBeNull();
+    });
+  });
+
+  describe("computeColumnTracks", () => {
+    it("should compute proportional fr tracks based on content length", () => {
+      const table = {
+        headers: ["ID", "Description"],
+        alignments: ["left" as const, "left" as const],
+        rows: [
+          ["1", "A longer description here"],
+          ["2", "Another long text entry"],
+        ],
+      };
+      const tracks = computeColumnTracks(table);
+      expect(tracks).toContain("fr");
+      const parts = tracks.split(" ");
+      expect(parts).toHaveLength(2);
+      expect(parseFloat(parts[1])).toBeGreaterThan(parseFloat(parts[0]));
     });
   });
 });

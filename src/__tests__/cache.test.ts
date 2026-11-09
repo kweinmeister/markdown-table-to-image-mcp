@@ -29,6 +29,29 @@ describe("Memory Rendering Cache", () => {
     expect(getCacheSize()).toBe(1);
   });
 
+  it("differentiates cache keys by new styling options and formats", () => {
+    const base = { markdown: "| A |\n| --- |\n| B |" };
+    const keyDefault = generateCacheKey(base);
+    const keySubtitle = generateCacheKey({ ...base, subtitle: "Sub" });
+    const keyFooter = generateCacheKey({ ...base, footer: "Foot" });
+    const keyWebp = generateCacheKey({ ...base, format: "webp" });
+    const keyZebraOff = generateCacheKey({ ...base, zebraStriping: false });
+    const keyBadgeOff = generateCacheKey({ ...base, statusBadges: false });
+    const keyTransCanvas = generateCacheKey({ ...base, transparentCanvas: true });
+
+    const keys = new Set([
+      keyDefault,
+      keySubtitle,
+      keyFooter,
+      keyWebp,
+      keyZebraOff,
+      keyBadgeOff,
+      keyTransCanvas,
+    ]);
+
+    expect(keys.size).toBe(7);
+  });
+
   it("evicts oldest entry when MAX_CACHE_SIZE is reached", () => {
     // Set cache up to MAX_CACHE_SIZE (100 items)
     const buffers = Array.from({ length: 101 }, (_, i) => Buffer.from(`png-bytes-${i}`));
@@ -49,9 +72,6 @@ describe("Memory Rendering Cache", () => {
     expect(getCachedImage(keys[0])).toBeDefined();
 
     // Insert 101st item. Since cache size limit is 100, this must trigger eviction.
-    // The oldest inserted item (which is now index 1, since index 0 was hit and refreshed!) should remain,
-    // but index 1 is now the oldest since index 0 was refreshed!
-    // Let's clear cache first and insert without hit to keep the math simple:
     clearCache();
 
     for (let i = 0; i < 100; i++) {
@@ -82,9 +102,6 @@ describe("Memory Rendering Cache", () => {
     const hitA = getCachedImage(keyA);
     expect(hitA).toBeDefined();
 
-    // Now trigger eviction by filling cache. To simulate eviction, we can make cache store MAX_CACHE_SIZE items.
-    // Since we want to verify that B is evicted before A because A was refreshed, let's write a simple sequence:
-    // We have 100 maximum size.
     clearCache();
 
     const keys = Array.from({ length: 101 }, (_, i) => generateCacheKey({ markdown: `t-${i}` }));

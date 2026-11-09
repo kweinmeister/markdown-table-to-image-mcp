@@ -4,6 +4,12 @@
   "description": "FastMCP server that converts markdown tables to beautiful images using Takumi",
   "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "markdown-table-to-image-mcp": "./dist/server.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "start": "node dist/server.js",
